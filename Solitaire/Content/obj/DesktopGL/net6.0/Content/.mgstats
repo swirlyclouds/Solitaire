@@ -1,0 +1,4 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/muaz2/Documents/GitHub/Solitaire/Solitaire/Content/cardBack_blue1.png","C:/Users/muaz2/Documents/GitHub/Solitaire/Solitaire/Content/bin/DesktopGL/Content/cardBack_blue1.xnb","TextureProcessor","Texture2DContent",729,106485,0.1808723
+"C:/Users/muaz2/Documents/GitHub/Solitaire/Solitaire/Content/cardBack_green5.png","C:/Users/muaz2/Documents/GitHub/Solitaire/Solitaire/Content/bin/DesktopGL/Content/cardBack_green5.xnb","TextureProcessor","Texture2DContent",1674,106485,0.0050803
+"C:/Users/muaz2/Documents/GitHub/Solitaire/Solitaire/Content/playingCards.png","C:/Users/muaz2/Documents/GitHub/Solitaire/Solitaire/Content/bin/DesktopGL/Content/playingCards.xnb","TextureProcessor","Texture2DContent",145744,8388693,0.2590341
