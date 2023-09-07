@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -26,6 +27,9 @@ namespace Solitaire
         Column[] columns = new Column[7];
 
         private bool unclicked;
+        private bool isHolding;
+        private char origin;
+
         private Point lastPosition;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -38,6 +42,7 @@ namespace Solitaire
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             unclicked = true;
+            this.isHolding = false;
             this.hand = new List<Card>();
 
             sortedPiles.Add('H', new SortedPile());
@@ -157,15 +162,19 @@ namespace Solitaire
 
                     if (this.mouseState.Position.X >= 630 && this.mouseState.Position.X <= 700)
                     {
+
                         if (this.mouseState.Position != this.prevMouseState.Position)
                         {
-                            Console.WriteLine("Dragging");
-                            if (drawnPile.Count > 0)
+                            if (drawnPile.Count > 0 && !this.isHolding)
+                            {
                                 hand.Add(drawnPile.Pop());
+                                this.origin = 'H';
+                            }
+                            this.isHolding = true;
                         }
                         else
                         {
-                            Console.WriteLine("not drag");
+
                         }
                     }
                 }
@@ -174,6 +183,54 @@ namespace Solitaire
             {
                 unclicked = true;
                 this.prevMouseState = mouseState;
+
+                if (this.isHolding)
+                {
+                    if (columns[0].position.Y <= mouseState.Position.Y)
+                    {
+                        foreach (Column col in columns)
+                        {
+
+                            if (mouseState.Position.X >= col.position.X && mouseState.Position.X <= col.position.X + 70)
+                            {
+                                if (col.GetCards().Count > 0)
+                                {
+                                    Card c = col.GetCards().Last();
+                                    Console.WriteLine(col.GetCards().Last().getSuit());
+                                    if (((c.getSuit() == 'C' || c.getSuit() == 'S') && (hand[0].getSuit() == 'H' || hand[0].getSuit() == 'D'))
+                                        ||
+                                        (c.getSuit() == 'H' || c.getSuit() == 'D') && (hand[0].getSuit() == 'C' || hand[0].getSuit() == 'S')
+                                        )
+                                    {
+                                        Console.WriteLine("add to column");
+                                        col.GetCards().AddRange(hand);
+                                        hand.Clear();
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    col.GetCards().AddRange(hand);
+                                    hand.Clear();
+                                    break;
+                                }
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        switch (this.origin)
+                        {
+                            case 'H':
+                                drawnPile.Push(hand[0]);
+                                hand.Clear();
+                                break;
+                        }
+                    }
+
+                }
+                this.isHolding = false;
             }
             base.Update(gameTime);
         }

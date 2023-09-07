@@ -25,6 +25,11 @@ namespace Solitaire
             this.y = int.Parse(y);
         }
 
+        public char getSuit()
+        {
+            return suit;
+        }
+
         public int getX()
         {
             return x;
