@@ -19,6 +19,7 @@ namespace Solitaire
         Card[] deck = new Card[52];
         int cn = 0;
 
+        Stack<Card> undrawnPile = new Stack<Card>();
         Stack<Card> drawnPile = new Stack<Card>();
         Dictionary<char, SortedPile> sortedPiles;
         Column[] columns = new Column[7];
@@ -82,10 +83,13 @@ namespace Solitaire
 
             shuffleDeck();
 
-            columns[0].Add(deck[0]);
-            columns[0].Add(deck[1]);
-            columns[0].Add(deck[2]);
-            sortedPiles['H'].addCard(deck[0]);
+            foreach (Card card in deck)
+            {
+                undrawnPile.Push(card);
+            }
+            for(int i = 0; i < 3; i++)
+            columns[0].Add(undrawnPile.Pop());
+            sortedPiles['H'].addCard(undrawnPile.Pop());
             base.Initialize();
         }
 
@@ -111,13 +115,19 @@ namespace Solitaire
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Left))
             {
-                cn--;
-                if (cn < 0)
-                    cn = 51;
+                if(undrawnPile.Count > 0)
+                    drawnPile.Push(undrawnPile.Pop());
+                else
+                {
+                    undrawnPile = new Stack<Card>(drawnPile);
+                    drawnPile.Clear();
+                }
                 Console.WriteLine(deck[cn].getCardPath());
             }
-            // TODO: Add your update logic here
-            columns[0].update();
+
+            foreach (Column col in columns)
+                col.update();
+
             base.Update(gameTime);
         }
 
@@ -125,10 +135,12 @@ namespace Solitaire
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
-            _spriteBatch.Begin();
 
-            _spriteBatch.Draw(cards, new Rectangle(720, 10, 70, 95), new Rectangle(deck[cn].getX(), deck[cn].getY(), 140, 190), Color.White);
+            _spriteBatch.Begin();
+            if(drawnPile.Count > 0)
+                _spriteBatch.Draw(cards, new Rectangle(630, 10, 70, 95), new Rectangle(drawnPile.Peek().getX(), drawnPile.Peek().getY(), 140, 190), Color.White);
+            if(undrawnPile.Count > 0)
+            _spriteBatch.Draw(cards, new Rectangle(720, 10, 70, 95), new Rectangle(undrawnPile.Peek().getX(), undrawnPile.Peek().getY(), 140, 190), Color.White);
 
             int n = 0;
             // 4 stacks
