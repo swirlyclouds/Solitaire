@@ -21,16 +21,25 @@ namespace Solitaire
 
         Stack<Card> undrawnPile = new Stack<Card>();
         Stack<Card> drawnPile = new Stack<Card>();
+        List<Card> hand;
         Dictionary<char, SortedPile> sortedPiles;
         Column[] columns = new Column[7];
 
+        private bool unclicked;
+        private Point lastPosition;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private MouseState mouseState, prevMouseState;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             sortedPiles = new Dictionary<char, SortedPile>();
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+            unclicked = true;
+            this.hand = new List<Card>();
+
             sortedPiles.Add('H', new SortedPile());
             sortedPiles.Add('C', new SortedPile());
             sortedPiles.Add('S', new SortedPile());
@@ -38,8 +47,8 @@ namespace Solitaire
 
             for (int i = 0; i < 7; i++)
                 columns[i] = new Column(new Rectangle(10 + 90 * i, 150, 70, 95));
-            Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+
+
         }
 
         protected override void Initialize()
@@ -89,7 +98,6 @@ namespace Solitaire
             }
             for(int i = 0; i < 3; i++)
             columns[0].Add(undrawnPile.Pop());
-            sortedPiles['H'].addCard(undrawnPile.Pop());
             base.Initialize();
         }
 
@@ -107,6 +115,7 @@ namespace Solitaire
 
 
         }
+
 
         protected override void Update(GameTime gameTime)
         {
@@ -128,6 +137,44 @@ namespace Solitaire
             foreach (Column col in columns)
                 col.update();
 
+            this.mouseState = Mouse.GetState();
+
+            if(this.mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if ( this.mouseState.Position.Y >= 10 && this.mouseState.Position.Y <= 105)
+                {
+                    if (this.mouseState.Position.X >= 720 && this.mouseState.Position.X <= 790 && unclicked)
+                    {
+                        unclicked = false;
+                        if (undrawnPile.Count > 0)
+                            drawnPile.Push(undrawnPile.Pop());
+                        else
+                        {
+                            undrawnPile = new Stack<Card>(drawnPile);
+                            drawnPile.Clear();
+                        }
+                    }
+
+                    if (this.mouseState.Position.X >= 630 && this.mouseState.Position.X <= 700)
+                    {
+                        if (this.mouseState.Position != this.prevMouseState.Position)
+                        {
+                            Console.WriteLine("Dragging");
+                            if (drawnPile.Count > 0)
+                                hand.Add(drawnPile.Pop());
+                        }
+                        else
+                        {
+                            Console.WriteLine("not drag");
+                        }
+                    }
+                }
+            }
+            if(this.mouseState.LeftButton == ButtonState.Released)
+            {
+                unclicked = true;
+                this.prevMouseState = mouseState;
+            }
             base.Update(gameTime);
         }
 
@@ -137,10 +184,12 @@ namespace Solitaire
 
 
             _spriteBatch.Begin();
+
+            // Deck and drawn cards
             if(drawnPile.Count > 0)
                 _spriteBatch.Draw(cards, new Rectangle(630, 10, 70, 95), new Rectangle(drawnPile.Peek().getX(), drawnPile.Peek().getY(), 140, 190), Color.White);
             if(undrawnPile.Count > 0)
-            _spriteBatch.Draw(cards, new Rectangle(720, 10, 70, 95), new Rectangle(undrawnPile.Peek().getX(), undrawnPile.Peek().getY(), 140, 190), Color.White);
+                _spriteBatch.Draw(back, new Rectangle(720, 10, 70, 95), new Rectangle(0, 0, back.Width, back.Height), Color.White);
 
             int n = 0;
             // 4 stacks
@@ -167,6 +216,10 @@ namespace Solitaire
                 }
                 n++;
             }
+
+            if(hand.Count > 0)
+                _spriteBatch.Draw(cards, new Rectangle(this.mouseState.X-28, this.mouseState.Y-38, 56, 76), new Rectangle(hand[0].getX(), hand[0].getY(), 140, 190), Color.White);
+
 
             _spriteBatch.End();
 
