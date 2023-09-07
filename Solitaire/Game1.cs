@@ -196,15 +196,18 @@ namespace Solitaire
                                 if (col.GetCards().Count > 0)
                                 {
                                     Card c = col.GetCards().Last();
-                                    Console.WriteLine(col.GetCards().Last().getSuit());
-                                    if (((c.getSuit() == 'C' || c.getSuit() == 'S') && (hand[0].getSuit() == 'H' || hand[0].getSuit() == 'D'))
+                                    if ((((c.getSuit() == 'C' || c.getSuit() == 'S') && (hand[0].getSuit() == 'H' || hand[0].getSuit() == 'D'))
                                         ||
                                         (c.getSuit() == 'H' || c.getSuit() == 'D') && (hand[0].getSuit() == 'C' || hand[0].getSuit() == 'S')
+                                        )
+                                        &&
+                                        (c.getValue() == hand[0].getValue() + 1)
                                         )
                                     {
                                         Console.WriteLine("add to column");
                                         col.GetCards().AddRange(hand);
                                         hand.Clear();
+                                        this.isHolding = false;
                                         break;
                                     }
                                 }
@@ -212,23 +215,26 @@ namespace Solitaire
                                 {
                                     col.GetCards().AddRange(hand);
                                     hand.Clear();
+                                    this.isHolding = false;
                                     break;
                                 }
                             }
                         }
                         
                     }
-                    else
-                    {
-                        switch (this.origin)
-                        {
-                            case 'H':
-                                drawnPile.Push(hand[0]);
-                                hand.Clear();
-                                break;
-                        }
-                    }
+                }
 
+
+                if (this.isHolding)
+                {
+                    switch (this.origin)
+                    {
+                        case 'H':
+                            drawnPile.Push(hand[0]);
+                            hand.Clear();
+                            break;
+                    }
+                    this.origin = ' ';
                 }
                 this.isHolding = false;
             }

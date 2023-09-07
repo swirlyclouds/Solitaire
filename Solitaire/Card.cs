@@ -29,7 +29,10 @@ namespace Solitaire
         {
             return suit;
         }
-
+        public int getValue()
+        {
+            return value;
+        }
         public int getX()
         {
             return x;
