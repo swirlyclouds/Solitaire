@@ -1,4 +1,4 @@
 # Solitaire
 Solitaire made using C# and MonoGame
 
-![ ]("Screenshot.png")
+![ ]("https://raw.githubusercontent.com/swirlyclouds/Solitaire/main/Screenshot.png")
