@@ -76,7 +76,6 @@ namespace Solitaire
                     string filename = root.ChildNodes[i].Attributes["name"].Value;
                     string value = Regex.Match(filename, @"((\d)+|(\S))[.](.{3})\s*$").Value;
                     value = value.Substring(0, value.Length - 4);
-                    Console.WriteLine(value);
 
                     char suit = filename[4];
                     if (value == "K")
@@ -101,8 +100,13 @@ namespace Solitaire
             {
                 undrawnPile.Push(card);
             }
-            for(int i = 0; i < 3; i++)
-            columns[0].Add(undrawnPile.Pop());
+            Console.WriteLine(deck.Length);
+            for (int i = 0; i < columns.Length; i++) { 
+                for(int j = 0; j < i; j++)
+                {
+                    columns[i].Add(undrawnPile.Pop());
+                }
+            }
             base.Initialize();
         }
 
@@ -150,11 +154,31 @@ namespace Solitaire
             {
                 drawCard();
             }
-
-            foreach (Column col in columns)
-                col.update();
+            if (hand.Count == 0)
+            {
+                foreach (Column col in columns)
+                    col.update();
+            }
 
             this.mouseState = Mouse.GetState();
+            if (this.mouseState.RightButton == ButtonState.Pressed)
+            {
+                if (this.mouseState.Position.Y >= 10 && this.mouseState.Position.Y <= 105)
+                {
+                    if (this.mouseState.Position.X >= 630 && this.mouseState.Position.X <= 700)
+                    {
+                        if (unclicked)
+                        {
+                            unclicked = false;
+                            if (sortedPiles[drawnPile.Peek().getSuit()].count() + 1 == drawnPile.Peek().getValue())
+                            {
+                                sortedPiles[drawnPile.Peek().getSuit()].addCard(drawnPile.Pop());
+                                unclicked = false;
+                            }
+                        }
+                    }
+                }
+            }
 
             if (this.mouseState.LeftButton == ButtonState.Pressed)
             {
@@ -168,39 +192,51 @@ namespace Solitaire
 
                     if (this.mouseState.Position.X >= 630 && this.mouseState.Position.X <= 700)
                     {
-
                         if (this.mouseState.Position != this.prevMouseState.Position)
                         {
-                            if (drawnPile.Count > 0 && !this.isHolding)
+                            if (drawnPile.Count > 0 && hand.Count == 0)
                             {
                                 hand.Add(drawnPile.Pop());
                                 this.origin = 'H';
                             }
-                            this.isHolding = true;
                         }
                     }
                 }
                 if (columns[0].position.Y <= mouseState.Position.Y)
                 {
-                    for (int i = columns.Length - 1; i >= 0; i--)
+                    if (hand.Count == 0)
                     {
-                        // is in column?
-                        if (!isHolding)
+                        for (int i = columns.Length - 1; i >= 0; i--)
                         {
+                            // is in column?
                             if (mouseState.Position.X >= columns[i].position.X && mouseState.Position.X <= columns[i].position.X + 70)
                             {
+                            
                                 List<Card> knownCards = columns[i].GetCards();
                                 int offset = columns[i].getSizeofCoveredStack();
                                 for (int j = knownCards.Count - 1; j >= 0; j--)
                                 {
                                     if (mouseState.Position.Y > (columns[i].position.Y + (offset + j) * 30))
                                     {
-                                        Console.WriteLine("Stack found");
-                                        hand.AddRange(knownCards.GetRange(j, knownCards.Count - j));
-                                        knownCards.RemoveRange(j, knownCards.Count - j);
-                                        this.isHolding = true;
-                                        this.origin = Convert.ToChar(i);
-                                        break;
+                                        if (j == knownCards.Count() - 1) {
+                                            if (unclicked)
+                                            {
+                                                if (sortedPiles[knownCards.Last().getSuit()].count() + 1 == knownCards.Last().getValue())
+                                                {
+                                                    sortedPiles[drawnPile.Peek().getSuit()].addCard(knownCards.Last());
+                                                    knownCards.RemoveAt(knownCards.Count - 1);
+                                                    unclicked = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                            Console.WriteLine("Stack found");
+                                            hand.AddRange(knownCards.GetRange(j, knownCards.Count - j));
+                                            knownCards.RemoveRange(j, knownCards.Count - j);
+                                            this.isHolding = true;
+                                            this.origin = Convert.ToChar(i);
+                                            break;
+                                        
                                     }
                                 }
 
@@ -209,12 +245,13 @@ namespace Solitaire
                     }
                 }
             }
+            // click actions
             if(this.mouseState.LeftButton == ButtonState.Released)
             {
                 unclicked = true;
                 this.prevMouseState = mouseState;
-
-                if (this.isHolding)
+                
+                if (hand.Count > 0)
                 {
                     if (columns[0].position.Y <= mouseState.Position.Y)
                     {
@@ -249,7 +286,7 @@ namespace Solitaire
                 }
 
 
-                if (this.isHolding)
+                if (hand.Count > 0)
                 {
                     switch (this.origin)
                     {
@@ -326,8 +363,8 @@ namespace Solitaire
             {
                 int j = cardIndex.Next(52);
                 Card temp = deck[i];
-                deck[j] = deck[i];
-                deck[i] = temp;
+                deck[i] = deck[j];
+                deck[j] = temp;
             }
         }
     }
