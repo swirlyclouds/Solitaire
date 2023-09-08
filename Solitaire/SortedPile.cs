@@ -17,7 +17,7 @@ namespace Solitaire
 
         public Card topCard()
         {
-            return cards.Last();
+            return cards.Peek();
         }
 
         public void addCard(Card c)

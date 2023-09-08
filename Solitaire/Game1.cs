@@ -170,7 +170,8 @@ namespace Solitaire
                         if (unclicked)
                         {
                             unclicked = false;
-                            if (sortedPiles[drawnPile.Peek().getSuit()].count() + 1 == drawnPile.Peek().getValue())
+                            Card h = drawnPile.Peek();
+                            if (sortedPiles[h.getSuit()].count() + 1 == h.getValue())
                             {
                                 sortedPiles[drawnPile.Peek().getSuit()].addCard(drawnPile.Pop());
                                 unclicked = false;
@@ -223,7 +224,7 @@ namespace Solitaire
                                             {
                                                 if (sortedPiles[knownCards.Last().getSuit()].count() + 1 == knownCards.Last().getValue())
                                                 {
-                                                    sortedPiles[drawnPile.Peek().getSuit()].addCard(knownCards.Last());
+                                                    sortedPiles[knownCards.Last().getSuit()].addCard(knownCards.Last());
                                                     knownCards.RemoveAt(knownCards.Count - 1);
                                                     unclicked = false;
                                                     break;
