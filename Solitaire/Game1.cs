@@ -145,10 +145,23 @@ namespace Solitaire
                                         (based.getValue() == hand[0].getValue() + 1);
         }
 
+        private bool hasWon()
+        {
+            foreach (SortedPile pile in sortedPiles.Values)
+            {
+                if(pile.count() != 13)
+                    return false;
+            }
+            return true;
+        }
+
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            if (hasWon())
+                return;
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Left))
             {
